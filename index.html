@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AIT Student Clock-In</title>
+    
+    <!-- PWA Manifest & Theme -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1e3a8a">
+    <link rel="apple-touch-icon" href="icon-192x192.png">
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome for Icons -->
@@ -11,7 +17,7 @@
     <style>
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f8fafc; /* Tailwind slate-50 */
+            background-color: #f8fafc;
         }
         /* Custom spinner animation */
         .spinner {
@@ -78,6 +84,20 @@
                     </div>
                 </div>
 
+                <!-- Stream (NEW) -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Stream</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-graduation-cap absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+                        <select id="student-stream" required class="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all appearance-none bg-white">
+                            <option value="" disabled selected>Select Stream</option>
+                            <option value="KCC">KCC</option>
+                            <option value="OUM">OUM</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
+                    </div>
+                </div>
+
                 <!-- Manual Course Code -->
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">Course Code</label>
@@ -123,7 +143,6 @@
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-analytics.js";
         import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
-        // Your Firebase config
         const firebaseConfig = {
             apiKey: "AIzaSyDVqMmPMCDX5JFb85kTlfm6fCk8cNKciH4",
             authDomain: "ait-attendance-20bb6.firebaseapp.com",
@@ -138,6 +157,27 @@
         const analytics = getAnalytics(app);
         const db = getFirestore(app);
 
+        // --- Local Storage Auto-Fill ---
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedName = localStorage.getItem('ait_student_name');
+            const savedId = localStorage.getItem('ait_student_id');
+            const savedLevel = localStorage.getItem('ait_student_level');
+            const savedStream = localStorage.getItem('ait_student_stream'); // NEW
+
+            if (savedName) {
+                document.getElementById('student-name').value = savedName;
+            }
+            if (savedId) {
+                document.getElementById('student-id').value = savedId;
+            }
+            if (savedLevel) {
+                document.getElementById('student-level').value = savedLevel;
+            }
+            if (savedStream) {
+                document.getElementById('student-stream').value = savedStream; // NEW
+            }
+        });
+
         // --- Geolocation Helper (High Accuracy) ---
         function getCoordinates() {
             return new Promise((resolve) => {
@@ -146,7 +186,6 @@
                 } else {
                     navigator.geolocation.getCurrentPosition(
                         (position) => {
-                            // 6 decimal places for pinpoint map accuracy
                             const lat = position.coords.latitude.toFixed(6);
                             const lng = position.coords.longitude.toFixed(6);
                             const latDir = lat >= 0 ? 'N' : 'S';
@@ -158,9 +197,9 @@
                             resolve("Location Denied/Unavailable");
                         },
                         { 
-                            enableHighAccuracy: true, // Forces device GPS hardware
-                            timeout: 10000,           // 10 seconds to get a solid lock
-                            maximumAge: 0             // Rejects cached locations
+                            enableHighAccuracy: true,
+                            timeout: 10000,
+                            maximumAge: 0
                         }
                     );
                 }
@@ -234,6 +273,7 @@
             const name = document.getElementById('student-name').value.trim();
             const studentId = document.getElementById('student-id').value.trim().toUpperCase();
             const level = document.getElementById('student-level').value;
+            const stream = document.getElementById('student-stream').value; // NEW
             const courseCode = document.getElementById('course-code').value.trim().toUpperCase();
             const courseName = document.getElementById('course-name').value.trim();
 
@@ -245,16 +285,15 @@
             setLoadingState(true);
 
             try {
-                // Fetch High-Accuracy Geolocation and Timestamps
                 const gpsCoordinates = await getCoordinates();
                 const currentDate = getCurrentFormattedDate();
                 const currentTime = getCurrentFormattedTime();
 
-                // Build Payload
                 const attendanceData = {
                     name: name,
                     studentId: studentId,
                     level: level,
+                    stream: stream, // NEW
                     courseCode: courseCode,
                     courseName: courseName,
                     date: currentDate,
@@ -267,9 +306,15 @@
                 // Save to Firestore
                 await addDoc(collection(db, "student_attendance"), attendanceData);
 
+                // Save student details to local storage for next time
+                localStorage.setItem('ait_student_name', name);
+                localStorage.setItem('ait_student_id', studentId);
+                localStorage.setItem('ait_student_level', level);
+                localStorage.setItem('ait_student_stream', stream); // NEW
+
                 showMessage(`Success! Clocked in for ${courseCode}.`);
                 
-                // Reset course fields but keep Student details for convenience
+                // Reset ONLY the course fields
                 document.getElementById('course-code').value = "";
                 document.getElementById('course-name').value = "";
                 
@@ -280,6 +325,21 @@
                 setLoadingState(false);
             }
         });
+    </script>
+
+    <!-- PWA Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then((registration) => {
+                        console.log('ServiceWorker registered with scope:', registration.scope);
+                    })
+                    .catch((error) => {
+                        console.error('ServiceWorker registration failed:', error);
+                    });
+            });
+        }
     </script>
 </body>
 </html>
