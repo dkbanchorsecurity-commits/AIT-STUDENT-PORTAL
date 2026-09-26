@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIT Student Clock-In</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f8fafc; /* Tailwind slate-50 */
+        }
+        /* Custom spinner animation */
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s ease-in-out infinite;
+            display: none;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- Clock-In Card -->
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-xl overflow-hidden">
+        
+        <!-- Header -->
+        <div class="bg-blue-900 px-6 py-8 text-center relative border-b-4 border-yellow-400">
+            <img src="AIT.png" alt="AIT Logo" class="w-20 h-20 object-contain rounded-full shadow-md bg-white border-2 border-blue-800 mx-auto mb-4" onerror="this.src='https://ui-avatars.com/api/?name=AIT&background=ffffff&color=1e3a8a'">
+            <h1 class="text-2xl font-bold text-white tracking-wide">Student Portal</h1>
+            <p class="text-blue-200 text-sm mt-1">Class Attendance Clock-In</p>
+        </div>
+
+        <!-- Form Section -->
+        <div class="p-6 sm:p-8">
+            <form id="clockin-form" class="space-y-5">
+                
+                <!-- Full Name -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Full Name</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-user absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+                        <input type="text" id="student-name" required class="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="e.g., David Kwame Blessings">
+                    </div>
+                </div>
+
+                <!-- Student ID -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Student ID</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-id-card absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+                        <input type="text" id="student-id" required class="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all uppercase" placeholder="e.g., AIT24-001">
+                    </div>
+                </div>
+
+                <!-- Academic Level -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Level</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-layer-group absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+                        <select id="student-level" required class="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all appearance-none bg-white">
+                            <option value="" disabled selected>Select Level</option>
+                            <option value="Level 100">Level 100</option>
+                            <option value="Level 200">Level 200</option>
+                            <option value="Level 300">Level 300</option>
+                            <option value="Level 400">Level 400</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
+                    </div>
+                </div>
+
+                <!-- Manual Course Code -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Course Code</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-hashtag absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+                        <input type="text" id="course-code" required class="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all uppercase" placeholder="e.g., IT101">
+                    </div>
+                </div>
+
+                <!-- Manual Course Name -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Course Name</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-book absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+                        <input type="text" id="course-name" required class="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="e.g., Intro to Information Technology">
+                    </div>
+                </div>
+
+                <!-- Geolocation Notice -->
+                <div class="bg-blue-50 text-blue-800 text-xs rounded-lg p-3 flex items-start gap-2 border border-blue-100">
+                    <i class="fa-solid fa-location-dot mt-0.5 text-blue-500"></i>
+                    <p>Your location and the current time will be automatically recorded when you clock in to verify your attendance.</p>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" id="submit-btn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-4 rounded-xl transition-colors shadow-md flex items-center justify-center gap-2 mt-4">
+                    <span id="btn-text">Clock In Now</span>
+                    <div class="spinner" id="btn-spinner"></div>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Feedback Message Box -->
+    <div id="message-box" class="fixed top-4 left-1/2 transform -translate-x-1/2 -translate-y-24 opacity-0 bg-slate-800 text-white px-6 py-3 rounded-xl shadow-lg transition-all duration-500 z-50 flex items-center gap-3 w-[90%] max-w-sm pointer-events-none">
+        <i id="message-icon" class="fa-solid fa-circle-check text-green-400 text-xl"></i>
+        <span id="message-text" class="text-sm font-medium">Message goes here</span>
+    </div>
+
+    <!-- Firebase Integration -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-analytics.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+
+        // Your Firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyDVqMmPMCDX5JFb85kTlfm6fCk8cNKciH4",
+            authDomain: "ait-attendance-20bb6.firebaseapp.com",
+            projectId: "ait-attendance-20bb6",
+            storageBucket: "ait-attendance-20bb6.firebasestorage.app",
+            messagingSenderId: "262056210376",
+            appId: "1:262056210376:web:c8a7260a8491f932a69afd",
+            measurementId: "G-1GBE95RZ1M"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getFirestore(app);
+
+        // --- Geolocation Helper (High Accuracy) ---
+        function getCoordinates() {
+            return new Promise((resolve) => {
+                if (!navigator.geolocation) {
+                    resolve("Location Not Supported");
+                } else {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            // 6 decimal places for pinpoint map accuracy
+                            const lat = position.coords.latitude.toFixed(6);
+                            const lng = position.coords.longitude.toFixed(6);
+                            const latDir = lat >= 0 ? 'N' : 'S';
+                            const lngDir = lng >= 0 ? 'E' : 'W';
+                            resolve(`${Math.abs(lat)}° ${latDir}, ${Math.abs(lng)}° ${lngDir}`);
+                        },
+                        (error) => {
+                            console.warn("Geolocation Error:", error.message);
+                            resolve("Location Denied/Unavailable");
+                        },
+                        { 
+                            enableHighAccuracy: true, // Forces device GPS hardware
+                            timeout: 10000,           // 10 seconds to get a solid lock
+                            maximumAge: 0             // Rejects cached locations
+                        }
+                    );
+                }
+            });
+        }
+
+        // --- Date & Time Formatters ---
+        function getCurrentFormattedDate() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function getCurrentFormattedTime() {
+            const now = new Date();
+            let hours = now.getHours();
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12; 
+            const strHours = String(hours).padStart(2, '0');
+            return `${strHours}:${minutes} ${ampm}`;
+        }
+
+        // --- UI Helpers ---
+        function showMessage(text, type = "success") {
+            const msgBox = document.getElementById('message-box');
+            const msgText = document.getElementById('message-text');
+            const msgIcon = document.getElementById('message-icon');
+            
+            msgText.innerText = text;
+            
+            if (type === "success") {
+                msgIcon.className = "fa-solid fa-circle-check text-green-400 text-xl";
+                msgBox.className = "fixed top-4 left-1/2 transform -translate-x-1/2 translate-y-0 opacity-100 bg-slate-800 text-white px-6 py-3 rounded-xl shadow-lg transition-all duration-500 z-50 flex items-center gap-3 w-[90%] max-w-sm pointer-events-none";
+            } else {
+                msgIcon.className = "fa-solid fa-circle-exclamation text-red-400 text-xl";
+                msgBox.className = "fixed top-4 left-1/2 transform -translate-x-1/2 translate-y-0 opacity-100 bg-red-900 text-white px-6 py-3 rounded-xl shadow-lg transition-all duration-500 z-50 flex items-center gap-3 w-[90%] max-w-sm pointer-events-none";
+            }
+
+            setTimeout(() => {
+                msgBox.classList.remove('translate-y-0', 'opacity-100');
+                msgBox.classList.add('-translate-y-24', 'opacity-0');
+            }, 4000);
+        }
+
+        function setLoadingState(isLoading) {
+            const btn = document.getElementById('submit-btn');
+            const text = document.getElementById('btn-text');
+            const spinner = document.getElementById('btn-spinner');
+            
+            if (isLoading) {
+                btn.disabled = true;
+                btn.classList.add('opacity-80', 'cursor-not-allowed');
+                text.innerText = "Acquiring GPS Lock...";
+                spinner.style.display = "block";
+            } else {
+                btn.disabled = false;
+                btn.classList.remove('opacity-80', 'cursor-not-allowed');
+                text.innerText = "Clock In Now";
+                spinner.style.display = "none";
+            }
+        }
+
+        // --- Form Submission ---
+        document.getElementById('clockin-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('student-name').value.trim();
+            const studentId = document.getElementById('student-id').value.trim().toUpperCase();
+            const level = document.getElementById('student-level').value;
+            const courseCode = document.getElementById('course-code').value.trim().toUpperCase();
+            const courseName = document.getElementById('course-name').value.trim();
+
+            if (!courseCode || !courseName) {
+                showMessage("Please enter both the course code and name.", "error");
+                return;
+            }
+            
+            setLoadingState(true);
+
+            try {
+                // Fetch High-Accuracy Geolocation and Timestamps
+                const gpsCoordinates = await getCoordinates();
+                const currentDate = getCurrentFormattedDate();
+                const currentTime = getCurrentFormattedTime();
+
+                // Build Payload
+                const attendanceData = {
+                    name: name,
+                    studentId: studentId,
+                    level: level,
+                    courseCode: courseCode,
+                    courseName: courseName,
+                    date: currentDate,
+                    time: currentTime,
+                    gps: gpsCoordinates,
+                    status: 'present',
+                    timestamp: new Date().getTime() 
+                };
+
+                // Save to Firestore
+                await addDoc(collection(db, "student_attendance"), attendanceData);
+
+                showMessage(`Success! Clocked in for ${courseCode}.`);
+                
+                // Reset course fields but keep Student details for convenience
+                document.getElementById('course-code').value = "";
+                document.getElementById('course-name').value = "";
+                
+            } catch (error) {
+                console.error("Submission error:", error);
+                showMessage("Failed to submit attendance. Please check your connection.", "error");
+            } finally {
+                setLoadingState(false);
+            }
+        });
+    </script>
+</body>
+</html>
