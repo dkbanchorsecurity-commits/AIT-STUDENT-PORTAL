@@ -1,0 +1,21 @@
+{
+  "name": "AIT Student Clock-In",
+  "short_name": "AIT Clock-In",
+  "description": "Class Attendance Clock-In Portal for AIT Students",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#1e3a8a",
+  "icons": [
+    {
+      "src": "icon-192x192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "icon-512x512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}
