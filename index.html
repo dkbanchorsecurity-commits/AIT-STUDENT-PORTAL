@@ -10,29 +10,12 @@
     <meta name="theme-color" content="#1e3a8a">
     <link rel="apple-touch-icon" href="icon-192x192.png">
 
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS & Icons -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f8fafc;
-        }
-        /* Custom spinner animation */
-        .spinner {
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s ease-in-out infinite;
-            display: none;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-    </style>
+    
+    <!-- External CSS -->
+    <link rel="stylesheet" href="student.css">
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
 
@@ -84,7 +67,7 @@
                     </div>
                 </div>
 
-                <!-- Stream (NEW) -->
+                <!-- Stream -->
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">Stream</label>
                     <div class="relative">
@@ -128,6 +111,12 @@
                     <div class="spinner" id="btn-spinner"></div>
                 </button>
             </form>
+
+            <!-- PWA Install Button (Initially Hidden) -->
+            <button id="install-btn" class="hidden w-full mt-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2.5 px-4 rounded-xl transition-colors border border-slate-300 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-download"></i>
+                <span>Install App on Device</span>
+            </button>
         </div>
     </div>
 
@@ -137,209 +126,10 @@
         <span id="message-text" class="text-sm font-medium">Message goes here</span>
     </div>
 
-    <!-- Firebase Integration -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-analytics.js";
-        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyDVqMmPMCDX5JFb85kTlfm6fCk8cNKciH4",
-            authDomain: "ait-attendance-20bb6.firebaseapp.com",
-            projectId: "ait-attendance-20bb6",
-            storageBucket: "ait-attendance-20bb6.firebasestorage.app",
-            messagingSenderId: "262056210376",
-            appId: "1:262056210376:web:c8a7260a8491f932a69afd",
-            measurementId: "G-1GBE95RZ1M"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
-        const db = getFirestore(app);
-
-        // --- Local Storage Auto-Fill ---
-        window.addEventListener('DOMContentLoaded', () => {
-            const savedName = localStorage.getItem('ait_student_name');
-            const savedId = localStorage.getItem('ait_student_id');
-            const savedLevel = localStorage.getItem('ait_student_level');
-            const savedStream = localStorage.getItem('ait_student_stream'); // NEW
-
-            if (savedName) {
-                document.getElementById('student-name').value = savedName;
-            }
-            if (savedId) {
-                document.getElementById('student-id').value = savedId;
-            }
-            if (savedLevel) {
-                document.getElementById('student-level').value = savedLevel;
-            }
-            if (savedStream) {
-                document.getElementById('student-stream').value = savedStream; // NEW
-            }
-        });
-
-        // --- Geolocation Helper (High Accuracy) ---
-        function getCoordinates() {
-            return new Promise((resolve) => {
-                if (!navigator.geolocation) {
-                    resolve("Location Not Supported");
-                } else {
-                    navigator.geolocation.getCurrentPosition(
-                        (position) => {
-                            const lat = position.coords.latitude.toFixed(6);
-                            const lng = position.coords.longitude.toFixed(6);
-                            const latDir = lat >= 0 ? 'N' : 'S';
-                            const lngDir = lng >= 0 ? 'E' : 'W';
-                            resolve(`${Math.abs(lat)}° ${latDir}, ${Math.abs(lng)}° ${lngDir}`);
-                        },
-                        (error) => {
-                            console.warn("Geolocation Error:", error.message);
-                            resolve("Location Denied/Unavailable");
-                        },
-                        { 
-                            enableHighAccuracy: true,
-                            timeout: 10000,
-                            maximumAge: 0
-                        }
-                    );
-                }
-            });
-        }
-
-        // --- Date & Time Formatters ---
-        function getCurrentFormattedDate() {
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const day = String(now.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
-        }
-
-        function getCurrentFormattedTime() {
-            const now = new Date();
-            let hours = now.getHours();
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const ampm = hours >= 12 ? 'PM' : 'AM';
-            hours = hours % 12;
-            hours = hours ? hours : 12; 
-            const strHours = String(hours).padStart(2, '0');
-            return `${strHours}:${minutes} ${ampm}`;
-        }
-
-        // --- UI Helpers ---
-        function showMessage(text, type = "success") {
-            const msgBox = document.getElementById('message-box');
-            const msgText = document.getElementById('message-text');
-            const msgIcon = document.getElementById('message-icon');
-            
-            msgText.innerText = text;
-            
-            if (type === "success") {
-                msgIcon.className = "fa-solid fa-circle-check text-green-400 text-xl";
-                msgBox.className = "fixed top-4 left-1/2 transform -translate-x-1/2 translate-y-0 opacity-100 bg-slate-800 text-white px-6 py-3 rounded-xl shadow-lg transition-all duration-500 z-50 flex items-center gap-3 w-[90%] max-w-sm pointer-events-none";
-            } else {
-                msgIcon.className = "fa-solid fa-circle-exclamation text-red-400 text-xl";
-                msgBox.className = "fixed top-4 left-1/2 transform -translate-x-1/2 translate-y-0 opacity-100 bg-red-900 text-white px-6 py-3 rounded-xl shadow-lg transition-all duration-500 z-50 flex items-center gap-3 w-[90%] max-w-sm pointer-events-none";
-            }
-
-            setTimeout(() => {
-                msgBox.classList.remove('translate-y-0', 'opacity-100');
-                msgBox.classList.add('-translate-y-24', 'opacity-0');
-            }, 4000);
-        }
-
-        function setLoadingState(isLoading) {
-            const btn = document.getElementById('submit-btn');
-            const text = document.getElementById('btn-text');
-            const spinner = document.getElementById('btn-spinner');
-            
-            if (isLoading) {
-                btn.disabled = true;
-                btn.classList.add('opacity-80', 'cursor-not-allowed');
-                text.innerText = "Acquiring GPS Lock...";
-                spinner.style.display = "block";
-            } else {
-                btn.disabled = false;
-                btn.classList.remove('opacity-80', 'cursor-not-allowed');
-                text.innerText = "Clock In Now";
-                spinner.style.display = "none";
-            }
-        }
-
-        // --- Form Submission ---
-        document.getElementById('clockin-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const name = document.getElementById('student-name').value.trim();
-            const studentId = document.getElementById('student-id').value.trim().toUpperCase();
-            const level = document.getElementById('student-level').value;
-            const stream = document.getElementById('student-stream').value; // NEW
-            const courseCode = document.getElementById('course-code').value.trim().toUpperCase();
-            const courseName = document.getElementById('course-name').value.trim();
-
-            if (!courseCode || !courseName) {
-                showMessage("Please enter both the course code and name.", "error");
-                return;
-            }
-            
-            setLoadingState(true);
-
-            try {
-                const gpsCoordinates = await getCoordinates();
-                const currentDate = getCurrentFormattedDate();
-                const currentTime = getCurrentFormattedTime();
-
-                const attendanceData = {
-                    name: name,
-                    studentId: studentId,
-                    level: level,
-                    stream: stream, // NEW
-                    courseCode: courseCode,
-                    courseName: courseName,
-                    date: currentDate,
-                    time: currentTime,
-                    gps: gpsCoordinates,
-                    status: 'present',
-                    timestamp: new Date().getTime() 
-                };
-
-                // Save to Firestore
-                await addDoc(collection(db, "student_attendance"), attendanceData);
-
-                // Save student details to local storage for next time
-                localStorage.setItem('ait_student_name', name);
-                localStorage.setItem('ait_student_id', studentId);
-                localStorage.setItem('ait_student_level', level);
-                localStorage.setItem('ait_student_stream', stream); // NEW
-
-                showMessage(`Success! Clocked in for ${courseCode}.`);
-                
-                // Reset ONLY the course fields
-                document.getElementById('course-code').value = "";
-                document.getElementById('course-name').value = "";
-                
-            } catch (error) {
-                console.error("Submission error:", error);
-                showMessage("Failed to submit attendance. Please check your connection.", "error");
-            } finally {
-                setLoadingState(false);
-            }
-        });
-    </script>
-
-    <!-- PWA Service Worker Registration -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then((registration) => {
-                        console.log('ServiceWorker registered with scope:', registration.scope);
-                    })
-                    .catch((error) => {
-                        console.error('ServiceWorker registration failed:', error);
-                    });
-            });
-        }
-    </script>
+    <!-- External UI Script -->
+    <script src="student-ui.js"></script>
+    
+    <!-- External Firebase App Script -->
+    <script type="module" src="student-app.js"></script>
 </body>
 </html>
