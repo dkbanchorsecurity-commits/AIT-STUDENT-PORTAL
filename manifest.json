@@ -1,6 +1,6 @@
 {
   "name": "AIT Student Clock-In",
-  "short_name": "AIT Clock-In",
+  "short_name": "AIT Students",
   "description": "Class Attendance Clock-In Portal for AIT Students",
   "start_url": "/",
   "display": "standalone",
