@@ -4,36 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AIT Student Clock-In</title>
-    
-    <!-- PWA Manifest & Theme -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#1e3a8a">
     <link rel="apple-touch-icon" href="icon-192x192.png">
-
-    <!-- Tailwind CSS & Icons -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- External CSS -->
     <link rel="stylesheet" href="student.css">
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
-
-    <!-- Clock-In Card -->
     <div class="bg-white w-full max-w-md rounded-2xl shadow-xl overflow-hidden">
-        
-        <!-- Header -->
         <div class="bg-blue-900 px-6 py-8 text-center relative border-b-4 border-yellow-400">
             <img src="AIT.png" alt="AIT Logo" class="w-20 h-20 object-contain rounded-full shadow-md bg-white border-2 border-blue-800 mx-auto mb-4" onerror="this.src='https://ui-avatars.com/api/?name=AIT&background=ffffff&color=1e3a8a'">
             <h1 class="text-2xl font-bold text-white tracking-wide">Student Portal</h1>
             <p class="text-blue-200 text-sm mt-1">Class Attendance Clock-In</p>
         </div>
 
-        <!-- Form Section -->
         <div class="p-6 sm:p-8">
             <form id="clockin-form" class="space-y-5">
-                
-                <!-- Full Name -->
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">Full Name</label>
                     <div class="relative">
@@ -42,7 +29,6 @@
                     </div>
                 </div>
 
-                <!-- Student ID -->
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">Student ID</label>
                     <div class="relative">
@@ -51,46 +37,51 @@
                     </div>
                 </div>
 
-                <!-- Academic Level -->
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Level</label>
-                    <div class="relative">
-                        <i class="fa-solid fa-layer-group absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
-                        <select id="student-level" required class="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all appearance-none bg-white">
-                            <option value="" disabled selected>Select Level</option>
-                            <option value="Level 100">Level 100</option>
-                            <option value="Level 200">Level 200</option>
-                            <option value="Level 300">Level 300</option>
-                            <option value="Level 400">Level 400</option>
-                        </select>
-                        <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Level</label>
+                        <div class="relative">
+                            <i class="fa-solid fa-layer-group absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+                            <select id="student-level" required class="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all appearance-none bg-white">
+                                <option value="" disabled selected>Select Level</option>
+                                <option value="Level 100">Level 100</option>
+                                <option value="Level 200">Level 200</option>
+                                <option value="Level 300">Level 300</option>
+                                <option value="Level 400">Level 400</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Stream</label>
+                        <div class="relative">
+                            <i class="fa-solid fa-graduation-cap absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+                            <select id="student-stream" required class="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all appearance-none bg-white">
+                                <option value="" disabled selected>Select Stream</option>
+                                <option value="KCC">KCC</option>
+                                <option value="OUM">OUM</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Stream -->
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Stream</label>
-                    <div class="relative">
-                        <i class="fa-solid fa-graduation-cap absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
-                        <select id="student-stream" required class="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all appearance-none bg-white">
-                            <option value="" disabled selected>Select Stream</option>
-                            <option value="KCC">KCC</option>
-                            <option value="OUM">OUM</option>
-                        </select>
-                        <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Course Code</label>
+                        <div class="relative">
+                            <i class="fa-solid fa-hashtag absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+                            <input type="text" id="course-code" required class="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all uppercase" placeholder="e.g., IT101">
+                        </div>
+                    </div>
+                    <!-- NEW HALL NAME INPUT -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Hall / Venue</label>
+                        <div class="relative">
+                            <i class="fa-solid fa-building absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+                            <input type="text" id="student-hall" required class="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all uppercase" placeholder="e.g., HALL A">
+                        </div>
                     </div>
                 </div>
 
-                <!-- Manual Course Code -->
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Course Code</label>
-                    <div class="relative">
-                        <i class="fa-solid fa-hashtag absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
-                        <input type="text" id="course-code" required class="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all uppercase" placeholder="e.g., IT101">
-                    </div>
-                </div>
-
-                <!-- Manual Course Name -->
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">Course Name</label>
                     <div class="relative">
@@ -99,20 +90,17 @@
                     </div>
                 </div>
 
-                <!-- Geolocation Notice -->
                 <div class="bg-blue-50 text-blue-800 text-xs rounded-lg p-3 flex items-start gap-2 border border-blue-100">
                     <i class="fa-solid fa-location-dot mt-0.5 text-blue-500"></i>
                     <p>Your location and the current time will be automatically recorded when you clock in to verify your attendance.</p>
                 </div>
 
-                <!-- Submit Button -->
                 <button type="submit" id="submit-btn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-4 rounded-xl transition-colors shadow-md flex items-center justify-center gap-2 mt-4">
                     <span id="btn-text">Clock In Now</span>
                     <div class="spinner" id="btn-spinner"></div>
                 </button>
             </form>
 
-            <!-- PWA Install Button (Initially Hidden) -->
             <button id="install-btn" class="hidden w-full mt-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2.5 px-4 rounded-xl transition-colors border border-slate-300 flex items-center justify-center gap-2">
                 <i class="fa-solid fa-download"></i>
                 <span>Install App on Device</span>
@@ -120,16 +108,12 @@
         </div>
     </div>
 
-    <!-- Feedback Message Box -->
     <div id="message-box" class="fixed top-4 left-1/2 transform -translate-x-1/2 -translate-y-24 opacity-0 bg-slate-800 text-white px-6 py-3 rounded-xl shadow-lg transition-all duration-500 z-50 flex items-center gap-3 w-[90%] max-w-sm pointer-events-none">
         <i id="message-icon" class="fa-solid fa-circle-check text-green-400 text-xl"></i>
         <span id="message-text" class="text-sm font-medium">Message goes here</span>
     </div>
 
-    <!-- External UI Script -->
     <script src="student-ui.js"></script>
-    
-    <!-- External Firebase App Script -->
     <script type="module" src="student-app.js"></script>
 </body>
 </html>
